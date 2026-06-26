@@ -227,14 +227,23 @@ footer {
   .foot-bottom { flex-direction: column; text-align: center; }
   .auth-box { padding: 30px 20px; margin: 14px; }
 }
+@media (max-width: 1024px) {
+  .burger {
+    display: flex !important;   /* force it to show */
+    flex-shrink: 0;             /* prevent it from collapsing */
+    margin-left: auto;          /* push it to the right edge */
+}
+
 .nav-right {
   flex-wrap: wrap;   /* allows items to move to next line */
   justify-content: flex-end; /* keeps them aligned right */
 }
 
 #nav-out {
-  font-size: 11px;   /* slightly smaller */
-  padding: 4px 8px;  /* tighter padding */
+  font-size: 11px;
+  padding: 4px 8px;
+  flex-shrink: 0;       /* prevent shrinking off-screen */
+  margin-left: 6px;     /* small gap from burger */
 }
 
 /* Prevent auth overlay flash on load */
