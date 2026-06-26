@@ -147,11 +147,20 @@ img { display: block; max-width: 100%; }
   color: var(--textdim); font-size: 12px; padding: 5px 11px; border-radius: 5px; cursor: pointer;
 }
 #nav-out:hover { border-color: #C05050; color: #C05050; }
+
+/* Burger row — sits below the brand/sign-out row, hidden on desktop */
+.nav-below {
+  display: none;
+  justify-content: center;
+  padding: 8px 0 12px;
+}
 .burger {
-  display: none; flex-direction: column; gap: 5px;
-  background: none; border: none; cursor: pointer; padding: 3px;
+  display: flex; flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer;
+  padding: 6px; width: 28px; height: 28px;
 }
 .burger span { display: block; width: 21px; height: 2px; background: var(--text); border-radius: 2px; }
+
 .drawer {
   display: flex; flex-direction: column; background: var(--bg2);
   border-top: 1px solid var(--border); overflow: hidden;
@@ -218,58 +227,13 @@ footer {
 /* ── Responsive ─── */
 @media (max-width: 1024px) {
   .nav-links { display: none; }
-  .burger { display: flex; }
-  .drawer { display: flex; }
+  .nav-below { display: flex; }
   .foot-grid { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 600px) {
   .foot-grid { grid-template-columns: 1fr; gap: 24px; }
   .foot-bottom { flex-direction: column; text-align: center; }
   .auth-box { padding: 30px 20px; margin: 14px; }
-}
-@media (max-width: 1024px) {
-  .burger {
-    display: flex !important;   /* force it to show */
-    flex-shrink: 0;             /* prevent it from collapsing */
-    margin-left: auto;          /* push it to the right edge */
-}
-
-.nav-right {
-  flex-wrap: wrap;   /* allows items to move to next line */
-  justify-content: flex-end; /* keeps them aligned right */
-}
-
-#nav-out {
-  font-size: 11px;
-  padding: 4px 8px;
-  flex-shrink: 0;       /* prevent shrinking off-screen */
-  margin-left: 6px;     /* small gap from burger */
-}
-.nav-below {
-  display: flex;
-  justify-content: center;   /* centers burger horizontally */
-  margin-top: 10px;          /* space below Sign Out */
-  margin-bottom: 12px;       /* space above “Est. 2008” */
-}
-
-.burger {
-  display: flex !important;
-  flex-direction: column;
-  gap: 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-}
-
-.burger span {
-  width: 20px;
-  height: 2px;
-  background: var(--text);
-  border-radius: 2px;
 }
 
 /* Prevent auth overlay flash on load */
