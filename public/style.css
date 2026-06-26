@@ -245,6 +245,32 @@ footer {
   flex-shrink: 0;       /* prevent shrinking off-screen */
   margin-left: 6px;     /* small gap from burger */
 }
+.nav-below {
+  display: flex;
+  justify-content: center;   /* centers burger horizontally */
+  margin-top: 10px;          /* space below Sign Out */
+  margin-bottom: 12px;       /* space above “Est. 2008” */
+}
+
+.burger {
+  display: flex !important;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.burger span {
+  width: 20px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 2px;
+}
 
 /* Prevent auth overlay flash on load */
 .auth-overlay { display: var(--overlay-init, flex); }
