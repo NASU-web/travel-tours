@@ -5,8 +5,7 @@
 // =====================================================
 
 // The URL of your backend server — change this if you deploy
-var API = 'http://localhost:3001/api';
-
+var API = 'https://travel-tours-production.up.railway.app/api';
 // ── Token helpers ────────────────────────────────────
 // We store the JWT token in localStorage so the user stays logged in
 // even if they refresh the page or open a new tab.
