@@ -216,7 +216,7 @@ footer {
 .foot-bottom em { color: var(--ochre); }
 
 /* ── Responsive ─── */
-@media (max-width: 900px) {
+@media (max-width: 1024px) {
   .nav-links { display: none; }
   .burger { display: flex; }
   .drawer { display: flex; }
