@@ -12,7 +12,7 @@ const fs       = require('fs');
 const path     = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // A secret key used to sign JWT tokens — in production, store this in an env variable
 const JWT_SECRET = 'nassor-travel-secret-2024';
