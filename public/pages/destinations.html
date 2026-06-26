@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Destinations — Nassor Travel Tours</title>
+  <link rel="stylesheet" href="../style.css"/>
+  <style>
+    /* filter bar */
+    .filter-bar { background:var(--bg2); border-bottom:1px solid var(--border); padding:18px 0; }
+    .filter-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .fl { font-size:12px; color:var(--textdim); text-transform:uppercase; letter-spacing:2px; margin-right:6px; }
+    .filt-btn {
+      padding:7px 16px; border-radius:100px; font-size:13px; font-weight:500;
+      font-family:var(--ff-b); cursor:pointer; border:1px solid var(--border);
+      background:transparent; color:var(--textdim); transition:all 0.2s;
+    }
+    .filt-btn:hover, .filt-btn.on { background:var(--ochre); color:#fff; border-color:var(--ochre); }
+
+    /* cards grid */
+    .cards { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+    .card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; overflow:hidden;
+      transition:transform 0.25s, border-color 0.25s;
+    }
+    .card:hover { transform:translateY(-5px); border-color:rgba(201,124,46,0.35); }
+    .card-img { height:190px; position:relative; }
+    .card-img-bg { width:100%; height:100%; }
+    .card-img .badge {
+      position:absolute; top:14px; left:14px;
+      font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+      color:var(--gold); background:rgba(0,0,0,0.55); border:1px solid rgba(224,168,58,0.3);
+      padding:3px 10px; border-radius:100px;
+    }
+    .card-body { padding:20px; }
+    .card-body h3 { font-size:1.35rem; margin-bottom:6px; }
+    .card-body p  { font-size:13px; color:var(--textdim); line-height:1.65; margin-bottom:16px; }
+    .card-meta { display:flex; justify-content:space-between; font-size:12px; color:var(--textdim); margin-bottom:14px; }
+    .card-meta span { display:flex; align-items:center; gap:5px; }
+    .card-body a { font-size:13px; font-weight:600; color:var(--ochre); }
+    .card-body a:hover { color:var(--gold); }
+
+    /* map section */
+    .map-sec { padding:90px 0; background:var(--bg2); }
+
+    @media(max-width:900px){ .cards { grid-template-columns:1fr 1fr; } }
+    @media(max-width:600px){ .cards { grid-template-columns:1fr; } }
+  </style>
+</head>
+<script>
+  /* Hide auth overlay instantly if user is already logged in — prevents flash */
+  (function () {
+    if (localStorage.getItem('ntt_token') && localStorage.getItem('ntt_user')) {
+      document.documentElement.style.setProperty('--overlay-init', 'none');
+    }
+  })();
+</script>
+<body>
+
+<!-- AUTH -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-pattern"></div>
+  <div class="auth-box">
+    <div class="auth-logo-wrap">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.18"/><circle cx="25" cy="34" r="3.5" fill="#C97C2E"/></svg>
+      <h1>Nassor Travel Tours</h1><p>Dar es Salaam · Tanzania</p>
+    </div>
+    <div id="login-form" class="aform on">
+      <h2>Karibu Tena <span class="note">(Welcome Back)</span></h2>
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <div id="login-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleLogin()">Sign In</button>
+      <p class="aswitch">No account? <a href="#" onclick="switchAuth('register')">Create one</a></p>
+      <button class="btn btn-ghost btn-block" onclick="guestMode()">Continue as Guest →</button>
+    </div>
+    <div id="reg-form" class="aform">
+      <h2>Join Us</h2>
+      <div class="fg"><label>Full Name</label><input type="text" id="reg-name" placeholder="Amina Hassan"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="reg-pass" placeholder="min. 6 characters"/></div>
+      <div id="reg-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleRegister()">Create Account</button>
+      <p class="aswitch">Have an account? <a href="#" onclick="switchAuth('login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-row">
+    <a href="../index.html" class="nav-brand">
+      <svg width="30" height="30" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2.5"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.28"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg>
+      Nassor <em>Travel</em>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="destinations.html" class="cur">Destinations</a></li>
+      <li><a href="itinerary.html">Itinerary</a></li>
+      <li><a href="notes.html">Travel Notes</a></li>
+      <li><a href="guestbook.html">Guestbook</a></li>
+      <li><a href="booking.html">booking</a></li>
+    </ul>
+    <div class="nav-right">
+      <span id="nav-who"></span>
+      <button id="nav-out" onclick="logout()">Sign Out</button>
+      <button class="burger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="../index.html">Home</a>
+    <a href="destinations.html">Destinations</a>
+    <a href="itinerary.html">Itinerary</a>
+    <a href="notes.html">Travel Notes</a>
+    <a href="guestbook.html">Guestbook</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="phero">
+  <div class="phero-inner">
+    <p class="ptag">Discover Tanzania</p>
+    <h1>Our Destinations</h1>
+    <p>From the snow-capped summit of Kilimanjaro to the turquoise shores of Zanzibar — Tanzania holds wonders for every traveller.</p>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="wrap filter-row">
+    <span class="fl">Filter:</span>
+    <button class="filt-btn on" onclick="filterCards(this,'all')">All</button>
+    <button class="filt-btn" onclick="filterCards(this,'safari')">Safari</button>
+    <button class="filt-btn" onclick="filterCards(this,'trekking')">Trekking</button>
+    <button class="filt-btn" onclick="filterCards(this,'beach')">Beach</button>
+    <button class="filt-btn" onclick="filterCards(this,'culture')">Culture</button>
+    <button class="filt-btn" onclick="filterCards(this,'wildlife')">Wildlife</button>
+  </div>
+</div>
+
+<!-- DESTINATION CARDS -->
+<section class="section">
+  <div class="wrap">
+    <div class="cards" id="cards">
+
+      <div class="card" data-cat="trekking">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Mount_Kilimanjaro.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Trekking</span>
+        </div>
+        <div class="card-body">
+          <h3>Mount Kilimanjaro</h3>
+          <div class="card-meta">
+            <span>⏱ 7 days</span>
+            <span>📍 Kilimanjaro Region</span>
+          </div>
+          <p>Africa's highest peak at 5,895m. Ascend through five climate zones — rainforest, heathland, moorland, alpine desert, and arctic summit — on a guided climb with our expert team.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="safari">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Wildebeest_Migration_in_Serengeti_National_Park,_Tanzania.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Safari</span>
+        </div>
+        <div class="card-body">
+          <h3>Serengeti National Park</h3>
+          <div class="card-meta">
+            <span>⏱ 4–6 days</span>
+            <span>📍 Mara Region</span>
+          </div>
+          <p>Home to the world-famous Great Migration — over 1.5 million wildebeest crossing the plains. Spot lions, elephants, and cheetahs in one of Africa's greatest wildlife spectacles.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="beach culture">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/White_sandy_beach_at_Nungwi,_Zanzibar.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Beach & Culture</span>
+        </div>
+        <div class="card-body">
+          <h3>Zanzibar Island</h3>
+          <div class="card-meta">
+            <span>⏱ 5–7 days</span>
+            <span>📍 Zanzibar Archipelago</span>
+          </div>
+          <p>The Spice Island — ancient Stone Town's UNESCO-listed alleys, white powder beaches at Nungwi, snorkelling with sea turtles, and fresh seafood grilled on the beach at sunset.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="wildlife safari">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Ngorongoro_Crater.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Wildlife</span>
+        </div>
+        <div class="card-body">
+          <h3>Ngorongoro Crater</h3>
+          <div class="card-meta">
+            <span>⏱ 2–3 days</span>
+            <span>📍 Arusha Region</span>
+          </div>
+          <p>The world's largest intact volcanic caldera, sheltering over 25,000 large animals. See all of the Big Five — lion, leopard, elephant, buffalo, and rhino — in one breathtaking bowl.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="culture">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Indian_Ocean_view_from_Dar_es_Salaam.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Culture</span>
+        </div>
+        <div class="card-body">
+          <h3>Dar es Salaam</h3>
+          <div class="card-meta">
+            <span>⏱ 2–3 days</span>
+            <span>📍 Coast Region</span>
+          </div>
+          <p>Tanzania's vibrant commercial capital on the Indian Ocean coast. Explore the National Museum, Kariakoo Market, Kivukoni Fish Market, and the warm Swahili hospitality of the city streets.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="wildlife safari">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Elephant_in_Front_of_Palms_(49931134972).jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Wildlife</span>
+        </div>
+        <div class="card-body">
+          <h3>Selous Game Reserve</h3>
+          <div class="card-meta">
+            <span>⏱ 3–4 days</span>
+            <span>📍 Morogoro Region</span>
+          </div>
+          <p>Africa's largest game reserve and a UNESCO World Heritage Site. Boat safaris on the Rufiji River, walking safaris, and fly camping under the stars far from any crowds or tourist circuits.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="culture trekking">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Ngorongoro,_Tanzania_-_Maasai_people.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Culture</span>
+        </div>
+        <div class="card-body">
+          <h3>Maasai Mara Villages</h3>
+          <div class="card-meta">
+            <span>⏱ 1–2 days</span>
+            <span>📍 Arusha Region</span>
+          </div>
+          <p>Visit a genuine Maasai boma (homestead) near Arusha. Learn about warrior traditions, ochre body decoration, beadwork, and cattle-herding culture that has endured for over 400 years.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="beach">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Evening_on_Mafia_island_(3198656798).jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Beach</span>
+        </div>
+        <div class="card-body">
+          <h3>Mafia Island</h3>
+          <div class="card-meta">
+            <span>⏱ 4–5 days</span>
+            <span>📍 Pwani Region</span>
+          </div>
+          <p>Tanzania's hidden gem — a tiny island with some of the world's best whale shark diving, pristine coral gardens, deserted beaches, and an atmosphere untouched by mass tourism.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+      <div class="card" data-cat="wildlife trekking">
+        <div class="card-img">
+          <div class="card-img-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Chimpanzee_in_the_wild.jpg?width=800') center/cover no-repeat"></div>
+          <span class="badge">Wildlife</span>
+        </div>
+        <div class="card-body">
+          <h3>Gombe Stream</h3>
+          <div class="card-meta">
+            <span>⏱ 3–4 days</span>
+            <span>📍 Kigoma Region</span>
+          </div>
+          <p>The smallest national park in Tanzania and home to Jane Goodall's famous chimpanzee research. Trek through dense forest to observe chimps in their natural habitat on the shores of Lake Tanganyika.</p>
+          <a href="itinerary.html">View Itinerary →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-sec">
+  <div class="wrap">
+    <div class="label">Navigate</div>
+    <h2 class="section-title">Tanzania on the Map</h2>
+    <p class="section-sub">All our destinations lie within this extraordinary country — combine several for the ultimate Tanzanian adventure.</p>
+    <div class="map-box">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Tanzania_location_map.svg?width=900" alt="Map of Tanzania showing its location in East Africa" loading="lazy"/>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="foot-brand-logo"><svg width="34" height="34" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.22"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg><strong>Nassor Travel Tours</strong></div>
+      <p>Crafting authentic Tanzanian experiences since 2008.</p>
+      <p class="contact">📍 mbezi beach Street, Dar es Salaam &nbsp;|&nbsp; 📞 +255 764 134 905</p>
+    </div>
+    <div class="foot-col"><h4>Pages</h4><a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a></div>
+    <div class="foot-col"><h4>Top Tours</h4><a href="destinations.html">Kilimanjaro</a><a href="destinations.html">Serengeti Safari</a><a href="destinations.html">Zanzibar Island</a><a href="destinations.html">Ngorongoro</a></div>
+  </div>
+  <div class="foot-bottom wrap">
+    <p>© 2024 Nassor Travel Tours Ltd. · Dar es Salaam, Tanzania</p>
+    <p><em>Karibu Tanzania — You are welcome.</em></p>
+  </div>
+</footer>
+
+<script src="../shared.js"></script>
+<script>
+  // Filter cards - simple JS
+  function filterCards(btn, cat) {
+    // update active button
+    var btns = document.querySelectorAll('.filt-btn');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('on');
+    btn.classList.add('on');
+
+    // show/hide cards
+    var cards = document.querySelectorAll('.card');
+    for (var i = 0; i < cards.length; i++) {
+      var cardCat = cards[i].getAttribute('data-cat');
+      if (cat === 'all' || cardCat.indexOf(cat) !== -1) {
+        cards[i].style.display = 'block';
+      } else {
+        cards[i].style.display = 'none';
+      }
+    }
+  }
+</script>
+</body>
+</html>

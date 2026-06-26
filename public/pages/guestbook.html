@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guestbook — Nassor Travel Tours</title>
+  <link rel="stylesheet" href="../style.css"/>
+  <style>
+    .gb-sec { padding:90px 0; }
+    .gb-layout { display:grid; grid-template-columns:380px 1fr; gap:48px; align-items:start; margin-top:44px; }
+    .gb-form-box {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:28px; position:sticky; top:82px;
+    }
+    .gb-form-box h3 { font-size:1.3rem; margin-bottom:22px; }
+    .gb-form-box .btn-fill { width:100%; text-align:center; }
+    .msgs-head { display:flex; align-items:center; gap:12px; margin-bottom:22px; }
+    .msgs-head h3 { font-size:1.3rem; }
+    .msg-count { background:rgba(201,124,46,0.15); color:var(--ochre); font-size:11px; padding:3px 10px; border-radius:100px; border:1px solid rgba(201,124,46,0.25); }
+    .msg-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:10px; padding:18px 20px; margin-bottom:14px;
+      animation:fadeup 0.3s ease;
+    }
+    @keyframes fadeup { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    .msg-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:7px; }
+    .msg-name { font-weight:600; color:var(--bright); font-size:15px; }
+    .msg-time { font-size:11px; color:var(--textdim); }
+    .msg-text { font-size:14px; color:var(--text); line-height:1.65; }
+    .empty { text-align:center; padding:44px 0; color:var(--textdim); }
+    .empty div { font-size:44px; margin-bottom:12px; }
+
+    @media(max-width:860px){
+      .gb-layout { grid-template-columns:1fr; }
+      .gb-form-box { position:static; }
+    }
+  </style>
+  <script>
+  /* Hide auth overlay instantly if user is already logged in — prevents flash */
+  (function () {
+    if (localStorage.getItem('ntt_token') && localStorage.getItem('ntt_user')) {
+      document.documentElement.style.setProperty('--overlay-init', 'none');
+    }
+  })();
+</script>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-pattern"></div>
+  <div class="auth-box">
+    <div class="auth-logo-wrap">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.18"/><circle cx="25" cy="34" r="3.5" fill="#C97C2E"/></svg>
+      <h1>Nassor Travel Tours</h1><p>Dar es Salaam · Tanzania</p>
+    </div>
+    <div id="login-form" class="aform on">
+      <h2>Karibu Tena <span class="note">(Welcome Back)</span></h2>
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <div id="login-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleLogin()">Sign In</button>
+      <p class="aswitch">No account? <a href="#" onclick="switchAuth('register')">Create one</a></p>
+      <button class="btn btn-ghost btn-block" onclick="guestMode()">Continue as Guest →</button>
+    </div>
+    <div id="reg-form" class="aform">
+      <h2>Join Us</h2>
+      <div class="fg"><label>Full Name</label><input type="text" id="reg-name" placeholder="Amina Hassan"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="reg-pass" placeholder="min. 6 characters"/></div>
+      <div id="reg-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleRegister()">Create Account</button>
+      <p class="aswitch">Have an account? <a href="#" onclick="switchAuth('login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-row">
+    <a href="../index.html" class="nav-brand">
+      <svg width="30" height="30" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2.5"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.28"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg>
+      Nassor <em>Travel</em>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="itinerary.html">Itinerary</a></li>
+      <li><a href="notes.html">Travel Notes</a></li>
+      <li><a href="guestbook.html" class="cur">Guestbook</a></li>
+      <li><a href="booking.html">booking</a></li>
+    </ul>
+    <div class="nav-right">
+      <span id="nav-who"></span>
+      <button id="nav-out" onclick="logout()">Sign Out</button>
+      <button class="burger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="phero">
+  <div class="phero-inner">
+    <p class="ptag">Community</p>
+    <h1>Guestbook</h1>
+    <p>Share your Tanzania experience or leave a message for fellow travellers. Every story matters.</p>
+  </div>
+</div>
+
+<!-- GUESTBOOK -->
+<section class="gb-sec">
+  <div class="wrap">
+    <div class="label">Say Hello</div>
+    <div class="gb-layout">
+
+      <!-- form -->
+      <div class="gb-form-box">
+        <h3>Leave a Message</h3>
+        <div class="fg">
+          <label>Your Name</label>
+          <input type="text" id="gb-name" placeholder="Amina Hassan"/>
+        </div>
+        <div class="fg">
+          <label>Where are you from?</label>
+          <input type="text" id="gb-from" placeholder="Nairobi, Kenya"/>
+        </div>
+        <div class="fg">
+          <label>Your Message</label>
+          <textarea id="gb-msg" rows="4" placeholder="Write about your Tanzania experience..."></textarea>
+        </div>
+        <div id="gb-err" class="ferr"></div>
+        <div id="gb-ok"  class="fok"></div>
+        <button class="btn btn-fill" onclick="postMessage()">Post Message ✦</button>
+      </div>
+
+      <!-- messages -->
+      <div>
+        <div class="msgs-head">
+          <h3>Messages</h3>
+          <span class="msg-count" id="msg-count">0</span>
+        </div>
+        <div id="msgs-list">
+          <div class="empty"><div>✉️</div><p>No messages yet. Be the first to write!</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="foot-brand-logo"><svg width="34" height="34" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.22"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg><strong>Nassor Travel Tours</strong></div>
+      <p>Crafting authentic Tanzanian experiences since 2008.</p>
+      <p class="contact">📍 Mbezi beach Street, Dar es Salaam &nbsp;|&nbsp; 📞 +255 764 134 905</p>
+    </div>
+    <div class="foot-col"><h4>Pages</h4><a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a></div>
+    <div class="foot-col"><h4>Top Tours</h4><a href="destinations.html">Kilimanjaro</a><a href="destinations.html">Serengeti Safari</a><a href="destinations.html">Zanzibar Island</a><a href="destinations.html">Ngorongoro</a></div>
+  </div>
+  <div class="foot-bottom wrap">
+    <p>© 2024 Nassor Travel Tours Ltd. · Dar es Salaam, Tanzania</p>
+    <p><em>Karibu Tanzania — You are welcome.</em></p>
+  </div>
+</footer>
+
+<script src="../shared.js"></script>
+<script>
+  // Format ISO date string to "3 Nov 2024"
+  function fmtDate(iso) {
+    var d = new Date(iso);
+    return d.toLocaleDateString('en-US', { day:'numeric', month:'short', year:'numeric' });
+  }
+
+  // Escape special HTML characters to prevent XSS attacks
+  function safe(str) {
+    var d = document.createElement('div');
+    d.appendChild(document.createTextNode(str));
+    return d.innerHTML;
+  }
+
+  // Fetch messages from the server and render them
+  async function renderMsgs() {
+    var list  = document.getElementById('msgs-list');
+    var count = document.getElementById('msg-count');
+
+    try {
+      var res  = await fetch(API + '/guestbook');
+      var msgs = await res.json();
+
+      count.textContent = msgs.length;
+      if (msgs.length === 0) {
+        list.innerHTML = '<div class="empty"><div>✉️</div><p>No messages yet. Be the first to write!</p></div>';
+        return;
+      }
+
+      // Build HTML for each message card
+      var html = '';
+      for (var i = 0; i < msgs.length; i++) {
+        var m = msgs[i];
+        html +=
+          '<div class="msg-card">' +
+            '<div class="msg-head">' +
+              '<span class="msg-name">✦ ' + safe(m.name) + (m.from ? ' <span style="font-size:12px;color:var(--textdim);font-weight:400">· ' + safe(m.from) + '</span>' : '') + '</span>' +
+              '<span class="msg-time">' + fmtDate(m.date) + '</span>' +
+            '</div>' +
+            '<p class="msg-text">' + safe(m.msg) + '</p>' +
+          '</div>';
+      }
+      list.innerHTML = html;
+
+    } catch (e) {
+      // If server is unreachable
+      list.innerHTML = '<div class="empty"><div>⚠️</div><p>Could not load messages. Is the server running?</p></div>';
+    }
+  }
+
+  // Send a new guestbook message to the server
+  async function postMessage() {
+    var name = document.getElementById('gb-name').value.trim();
+    var from = document.getElementById('gb-from').value.trim();
+    var msg  = document.getElementById('gb-msg').value.trim();
+    var err  = document.getElementById('gb-err');
+    var ok   = document.getElementById('gb-ok');
+    err.textContent = ''; ok.textContent = '';
+
+    // Client-side validation
+    if (!name) { err.textContent = 'Please enter your name.'; return; }
+    if (!msg)  { err.textContent = 'Please write a message.'; return; }
+    if (msg.length < 5) { err.textContent = 'Message is too short.'; return; }
+
+    try {
+      var res  = await fetch(API + '/guestbook', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ name, from, msg })
+      });
+      var data = await res.json();
+
+      if (!res.ok) {
+        err.textContent = data.error || 'Could not post message.'; return;
+      }
+
+      // Clear the form on success
+      document.getElementById('gb-name').value = '';
+      document.getElementById('gb-from').value = '';
+      document.getElementById('gb-msg').value  = '';
+      ok.textContent = 'Message posted! Asante sana. 🌍';
+      setTimeout(function(){ ok.textContent = ''; }, 3000);
+
+      renderMsgs(); // refresh the list
+
+    } catch (e) {
+      err.textContent = 'Cannot reach server. Is it running?';
+    }
+  }
+
+  // On page load — shared.js handles auth overlay, then we load messages
+  window.addEventListener('DOMContentLoaded', function() {
+    renderMsgs();
+  });
+</script>
+</body>
+</html>

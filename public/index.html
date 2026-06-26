@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nassor Travel Tours — Discover Tanzania</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ── HERO ─────────────────────────────────── */
+    .hero {
+      min-height: 100vh; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 100px 26px 80px;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 70%, rgba(42,92,40,0.22) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 50% at 75% 15%, rgba(192,82,42,0.14) 0%, transparent 55%),
+        linear-gradient(180deg, #100A05 0%, #1c1005 50%, #100A05 100%);
+    }
+    /* Maasai triangle pattern */
+    .hero-bg::after {
+      content:''; position:absolute; inset:0;
+      background-image:
+        repeating-linear-gradient(60deg,  rgba(201,124,46,0.04) 0,rgba(201,124,46,0.04) 1px, transparent 1px, transparent 48px),
+        repeating-linear-gradient(-60deg, rgba(201,124,46,0.04) 0,rgba(201,124,46,0.04) 1px, transparent 1px, transparent 48px);
+    }
+    .hero-inner { position:relative; z-index:1; max-width:740px; }
+    .hero-tag {
+      display:inline-flex; align-items:center; gap:10px;
+      font-size:11px; letter-spacing:3px; text-transform:uppercase;
+      color:var(--ochre); margin-bottom:22px;
+    }
+    .hero-tag .dot { width:7px; height:7px; background:var(--ochre); border-radius:50%; animation:blink 2s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .hero h1 {
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      color: var(--sand); line-height: 1.0; letter-spacing: -1px; margin-bottom: 22px;
+    }
+    .hero h1 em { display:block; color:var(--ochre); }
+    .hero p { font-size:1.1rem; color:var(--textdim); max-width:500px; margin:0 auto 34px; }
+    .hero-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    .hero-scroll {
+      position:absolute; bottom:34px; left:50%; transform:translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      color:var(--textdim); font-size:10px; letter-spacing:3px; text-transform:uppercase;
+    }
+    .scroll-line { width:1px; height:46px; background:linear-gradient(to bottom,transparent,var(--ochre)); animation:drop 2s infinite; }
+    @keyframes drop { 0%{opacity:0;transform:scaleY(0);transform-origin:top} 50%{opacity:1} 100%{opacity:0;transform:scaleY(1);transform-origin:top} }
+    .hero-pill {
+      position:absolute; bottom:90px; right:50px;
+      background:var(--surface); border:1px solid rgba(201,124,46,0.25);
+      border-radius:12px; padding:16px 20px; text-align:center;
+    }
+    .hero-pill strong { display:block; font-family:var(--ff-h); font-size:2.2rem; color:var(--ochre); line-height:1; }
+    .hero-pill span   { font-size:11px; color:var(--textdim); letter-spacing:1px; }
+
+    /* ── WHY US ──────────────────────────────── */
+    .why { padding:90px 0; background:var(--bg2); }
+    .why-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-top:44px; }
+    .why-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:30px 22px;
+      transition:transform 0.25s, border-color 0.25s;
+      position:relative; overflow:hidden;
+    }
+    .why-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:2px;
+      background:linear-gradient(90deg,transparent,var(--ochre),transparent);
+      opacity:0; transition:opacity 0.25s;
+    }
+    .why-card:hover { transform:translateY(-5px); border-color:rgba(201,124,46,0.3); }
+    .why-card:hover::before { opacity:1; }
+    .why-icon { font-size:2.2rem; margin-bottom:16px; }
+    .why-card h3 { font-size:1.2rem; margin-bottom:8px; }
+    .why-card p  { font-size:14px; color:var(--textdim); }
+
+    /* ── DESTINATIONS PREVIEW ─────────────────── */
+    .dest-prev { padding:90px 0; }
+    .dest-row  { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+    .see-all   { font-size:14px; font-weight:500; color:var(--ochre); border-bottom:1px solid rgba(201,124,46,0.3); padding-bottom:2px; }
+    .dest-grid { display:grid; grid-template-columns:1.6fr 1fr 1fr; gap:16px; }
+    .dcard {
+      display:block; border-radius:12px; overflow:hidden; min-height:220px;
+      position:relative; border:1px solid var(--border); cursor:pointer;
+      transition:transform 0.3s, box-shadow 0.3s;
+    }
+    .dcard-lg { grid-column:1; grid-row:1/3; min-height:460px; }
+    .dcard:hover { transform:translateY(-4px); box-shadow:0 18px 50px rgba(0,0,0,0.55); }
+    .dcard-bg { position:absolute; inset:0; transition:transform 0.5s; }
+    .dcard:hover .dcard-bg { transform:scale(1.07); }
+    .dcard-body {
+      position:absolute; bottom:0; left:0; right:0; padding:22px;
+      background:linear-gradient(transparent, rgba(0,0,0,0.78) 70%); z-index:2;
+    }
+    .dtag {
+      display:inline-block; font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+      color:var(--gold); border:1px solid rgba(224,168,58,0.35); background:rgba(0,0,0,0.4);
+      padding:2px 9px; border-radius:100px; margin-bottom:7px;
+    }
+    .dcard-body h3 { font-size:1.4rem; color:#fff; margin-bottom:5px; }
+    .dcard-lg .dcard-body h3 { font-size:1.9rem; }
+    .dcard-body p  { font-size:13px; color:rgba(255,255,255,0.65); margin-bottom:10px; }
+    .darrow { font-size:13px; color:var(--gold); font-weight:500; }
+
+    /* ── MAP ─────────────────────────────────── */
+    .map-sec { padding:90px 0; background:var(--bg2); }
+    .map-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-top:0; }
+    .mstat { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:22px 16px; text-align:center; }
+    .mstat:hover { border-color:rgba(201,124,46,0.3); }
+    .mstat strong { display:block; font-family:var(--ff-h); font-size:1.9rem; color:var(--ochre); }
+    .mstat span   { font-size:11px; color:var(--textdim); text-transform:uppercase; letter-spacing:1px; }
+
+    /* ── TESTIMONIALS ────────────────────────── */
+    .testi { padding:90px 0; }
+    .testi-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:44px; }
+    .tcard {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; padding:28px 24px; position:relative; overflow:hidden;
+    }
+    .tcard::before { content:'"'; position:absolute; top:-8px; left:16px; font-family:var(--ff-h); font-size:6rem; color:var(--ochre); opacity:0.12; line-height:1; }
+    .tcard .stars { color:var(--gold); font-size:14px; letter-spacing:2px; margin-bottom:14px; }
+    .tcard p { font-size:14px; color:var(--text); font-style:italic; line-height:1.7; margin-bottom:18px; }
+    .tcard .who { font-size:13px; color:var(--textdim); }
+    .tcard .who strong { color:var(--ochre); }
+
+    /* ── CTA ─────────────────────────────────── */
+    .cta-sec {
+      padding:90px 0; text-align:center; position:relative; overflow:hidden;
+      background:var(--bg2); border-top:1px solid var(--border);
+    }
+    .cta-sec::before {
+      content:''; position:absolute; inset:0;
+      background-image:
+        repeating-linear-gradient(60deg, rgba(201,124,46,0.05) 0,rgba(201,124,46,0.05) 1px, transparent 1px,transparent 36px),
+        repeating-linear-gradient(-60deg,rgba(201,124,46,0.05) 0,rgba(201,124,46,0.05) 1px, transparent 1px,transparent 36px);
+    }
+    .cta-inner { position:relative; z-index:1; }
+    .cta-sec h2 { font-size:clamp(2rem,4vw,3rem); margin-bottom:12px; }
+    .cta-sec p  { color:var(--textdim); margin-bottom:28px; font-size:1.05rem; }
+
+    /* responsive */
+    @media(max-width:960px){
+      .why-grid  { grid-template-columns:repeat(2,1fr); }
+      .dest-grid { grid-template-columns:1fr 1fr; }
+      .dcard-lg  { grid-column:1/3; grid-row:1; min-height:280px; }
+      .map-stats { grid-template-columns:repeat(2,1fr); }
+      .testi-grid{ grid-template-columns:1fr; }
+      .hero-pill { display:none; }
+    }
+    @media(max-width:600px){
+      .dest-grid { grid-template-columns:1fr; }
+      .dcard-lg  { grid-column:1; min-height:240px; }
+      .why-grid  { grid-template-columns:1fr; }
+      .hero-btns { flex-direction:column; align-items:center; }
+    }
+  </style>
+  <!-- Immediately hide the auth overlay if already logged in (prevents flash on load) -->
+  <script>
+    if (localStorage.getItem('ntt_token') && localStorage.getItem('ntt_user')) {
+      document.documentElement.classList.add('authed');
+    }
+  </script>
+</head>
+<body>
+
+<!-- AUTH OVERLAY -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-pattern"></div>
+  <div class="auth-box">
+    <div class="auth-logo-wrap">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none">
+        <polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/>
+        <polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.18"/>
+        <circle cx="25" cy="34" r="3.5" fill="#C97C2E"/>
+      </svg>
+      <h1>Nassor Travel Tours</h1>
+      <p>Dar es Salaam · Tanzania</p>
+    </div>
+    <div id="login-form" class="aform on">
+      <h2>Karibu Tena <span class="note">(Welcome Back)</span></h2>
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <div id="login-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleLogin()">Sign In</button>
+      <p class="aswitch">No account? <a href="#" onclick="switchAuth('register')">Create one</a></p>
+      <button class="btn btn-ghost btn-block" onclick="guestMode()">Continue as Guest →</button>
+    </div>
+    <div id="reg-form" class="aform">
+      <h2>Join Us</h2>
+      <div class="fg"><label>Full Name</label><input type="text" id="reg-name" placeholder="Amina Hassan"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="reg-pass" placeholder="min. 6 characters"/></div>
+      <div id="reg-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleRegister()">Create Account</button>
+      <p class="aswitch">Have an account? <a href="#" onclick="switchAuth('login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-row">
+    <a href="index.html" class="nav-brand">
+      <svg width="30" height="30" viewBox="0 0 50 50" fill="none">
+        <polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2.5"/>
+        <polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.28"/>
+        <circle cx="25" cy="34" r="3" fill="#C97C2E"/>
+      </svg>
+      Nassor <em>Travel</em>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="cur">Home</a></li>
+      <li><a href="pages/destinations.html">Destinations</a></li>
+      <li><a href="pages/itinerary.html">Itinerary</a></li>
+      <li><a href="pages/notes.html">Travel Notes</a></li>
+      <li><a href="pages/guestbook.html">Guestbook</a></li>
+      <li><a href="pages/booking.html">booking</a></li>
+    </ul>
+    <div class="nav-right">
+      <span id="nav-who"></span>
+      <button id="nav-out" onclick="logout()">Sign Out</button>
+      <button class="burger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="index.html">Home</a>
+    <a href="pages/destinations.html">Destinations</a>
+    <a href="pages/itinerary.html">Itinerary</a>
+    <a href="pages/notes.html">Travel Notes</a>
+    <a href="pages/guestbook.html">Guestbook</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <p class="hero-tag"><span class="dot"></span> Est. 2008 · Dar es Salaam, Tanzania</p>
+    <h1>Africa's Heart<em>Awaits You.</em></h1>
+    <p>From Kilimanjaro's summit to Zanzibar's coral reefs — we craft journeys that reveal Tanzania's true soul.</p>
+    <div class="hero-btns">
+      <a href="pages/destinations.html" class="btn btn-fill">Explore Destinations</a>
+      <a href="pages/itinerary.html" class="btn btn-line">View Itineraries</a>
+    </div>
+  </div>
+  <div class="hero-scroll"><div class="scroll-line"></div><span>Scroll</span></div>
+  <div class="hero-pill"><strong>500+</strong><span>Happy Travellers</span></div>
+</header>
+
+<!-- WHY US -->
+<section class="why">
+  <div class="wrap">
+    <div class="label">Why Choose Us</div>
+    <h2 class="section-title">Born in Tanzania,<br/>Built for the World</h2>
+    <div class="why-grid">
+      <div class="why-card">
+        <div class="why-icon">🦁</div>
+        <h3>Local Expertise</h3>
+        <p>Our guides are Tanzanian-born with decades of experience in the Serengeti, Kilimanjaro, and the Spice Islands.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🌿</div>
+        <h3>Eco-Conscious Travel</h3>
+        <p>We partner with eco-certified lodges and work with local communities so tourism benefits Tanzania directly.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">✦</div>
+        <h3>Tailor-Made Journeys</h3>
+        <p>Every itinerary is built around your pace, interests, and budget — from budget-friendly to full luxury.</p>
+      </div>
+      <div class="why-card">
+        <div class="why-icon">🤝</div>
+        <h3>24/7 Support</h3>
+        <p>From the moment you book until you're home safely, our Dar es Salaam team is always reachable.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED DESTINATIONS -->
+<section class="dest-prev">
+  <div class="wrap">
+    <div class="label">Top Picks</div>
+    <div class="dest-row">
+      <h2 class="section-title">Featured Destinations</h2>
+      <a href="pages/destinations.html" class="see-all">See All Destinations →</a>
+    </div>
+    <div class="dest-grid">
+      <a href="pages/destinations.html" class="dcard dcard-lg">
+        <div class="dcard-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Mount_Kilimanjaro.jpg?width=1200') center/cover no-repeat"></div>
+        <div class="dcard-body">
+          <span class="dtag">Trekking</span>
+          <h3>Mount Kilimanjaro</h3>
+          <p>Africa's highest peak at 5,895m. Conquer the Roof of Africa on a guided 7-day ascent through five climate zones.</p>
+          <span class="darrow">Explore →</span>
+        </div>
+      </a>
+      <a href="pages/destinations.html" class="dcard">
+        <div class="dcard-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Wildebeest_Migration_in_Serengeti_National_Park,_Tanzania.jpg?width=1000') center/cover no-repeat"></div>
+        <div class="dcard-body">
+          <span class="dtag">Safari</span>
+          <h3>Serengeti</h3>
+          <p>Witness the Great Migration — 1.5 million wildebeest in motion.</p>
+          <span class="darrow">Explore →</span>
+        </div>
+      </a>
+      <a href="pages/destinations.html" class="dcard">
+        <div class="dcard-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/White_sandy_beach_at_Nungwi,_Zanzibar.jpg?width=1000') center/cover no-repeat"></div>
+        <div class="dcard-body">
+          <span class="dtag">Beach & Culture</span>
+          <h3>Zanzibar</h3>
+          <p>Spice markets, white sand beaches, and ancient Stone Town.</p>
+          <span class="darrow">Explore →</span>
+        </div>
+      </a>
+      <a href="pages/destinations.html" class="dcard">
+        <div class="dcard-bg" style="background:linear-gradient(165deg,rgba(20,12,6,0.35),rgba(20,12,6,0.15)),url('https://commons.wikimedia.org/wiki/Special:FilePath/Ngorongoro_Crater.jpg?width=1000') center/cover no-repeat"></div>
+        <div class="dcard-body">
+          <span class="dtag">Wildlife</span>
+          <h3>Ngorongoro Crater</h3>
+          <p>The world's largest intact volcanic caldera — home to the Big Five.</p>
+          <span class="darrow">Explore →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-sec">
+  <div class="wrap">
+    <div class="label">Where We Operate</div>
+    <h2 class="section-title">Tanzania on the Map</h2>
+    <p class="section-sub">The United Republic of Tanzania — East Africa's crown jewel, spanning coast, savanna, and mountain.</p>
+    <div class="map-box">
+      <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Tanzania_location_map.svg?width=900" alt="Map of Tanzania showing its location in East Africa" loading="lazy"/>
+    </div>
+    <div class="map-stats">
+      <div class="mstat"><strong>945,087</strong><span>km² Area</span></div>
+      <div class="mstat"><strong>16</strong><span>National Parks</span></div>
+      <div class="mstat"><strong>120+</strong><span>Ethnic Groups</span></div>
+      <div class="mstat"><strong>Swahili</strong><span>National Language</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi">
+  <div class="wrap">
+    <div class="label">What Travellers Say</div>
+    <h2 class="section-title">Stories from the Field</h2>
+    <div class="testi-grid">
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p>"Nassor's team made our Kilimanjaro climb the experience of a lifetime. Every detail was perfect — from the porters to the summit tea."</p>
+        <div class="who"><strong>Sarah M.</strong> — London, UK</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p>"The Serengeti safari was beyond words. Our guide Juma knew exactly where the lions would be every morning. Magical."</p>
+        <div class="who"><strong>Carlos R.</strong> — Madrid, Spain</div>
+      </div>
+      <div class="tcard">
+        <div class="stars">★★★★★</div>
+        <p>"We booked a family trip to Zanzibar and Ngorongoro. The kids still talk about it two years later. Asante sana, Nassor!"</p>
+        <div class="who"><strong>The Okonkwo Family</strong> — Lagos, Nigeria</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="wrap cta-inner">
+    <h2>Ready to Discover Tanzania?</h2>
+    <p>Let Nassor Travel Tours craft your perfect East African adventure.</p>
+    <a href="pages/guestbook.html" class="btn btn-fill">Get in Touch</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="foot-brand-logo">
+        <svg width="34" height="34" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.22"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg>
+        <strong>Nassor Travel Tours</strong>
+      </div>
+      <p>Crafting authentic Tanzanian experiences since 2008. Based in Dar es Salaam, serving the world.</p>
+      <p class="contact">📍 mbezi beach Street, Dar es Salaam &nbsp;|&nbsp; 📞 +255 764 134 905</p>
+    </div>
+    <div class="foot-col">
+      <h4>Pages</h4>
+      <a href="index.html">Home</a>
+      <a href="pages/destinations.html">Destinations</a>
+      <a href="pages/itinerary.html">Itinerary</a>
+      <a href="pages/notes.html">Travel Notes</a>
+      <a href="pages/guestbook.html">Guestbook</a>
+    </div>
+    <div class="foot-col">
+      <h4>Top Tours</h4>
+      <a href="pages/destinations.html">Kilimanjaro Climb</a>
+      <a href="pages/destinations.html">Serengeti Safari</a>
+      <a href="pages/destinations.html">Zanzibar Island</a>
+      <a href="pages/destinations.html">Ngorongoro Crater</a>
+    </div>
+  </div>
+  <div class="foot-bottom wrap">
+    <p>© 2024 Nassor Travel Tours Ltd. · Dar es Salaam, Tanzania</p>
+    <p><em>Karibu Tanzania — You are welcome.</em></p>
+  </div>
+</footer>
+
+<script src="shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Travel Notes — Nassor Travel Tours</title>
+  <link rel="stylesheet" href="../style.css"/>
+  <style>
+    .notes-sec { padding:90px 0; }
+    .notes-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:26px; margin-top:44px; }
+    .ncard {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:12px; overflow:hidden;
+      transition:transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .ncard:hover { transform:translateY(-5px); border-color:rgba(201,124,46,0.35); box-shadow:0 16px 44px rgba(0,0,0,0.45); }
+    .ncard-cover {
+      height:185px; position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:center; font-size:60px;
+    }
+    .ncard-cover::after { content:''; position:absolute; inset:0; background:linear-gradient(transparent 50%,rgba(0,0,0,0.4) 100%); }
+    .ntag {
+      position:absolute; top:14px; left:14px; z-index:1;
+      font-size:10px; font-weight:600; letter-spacing:1.5px; text-transform:uppercase;
+      color:var(--gold); background:rgba(0,0,0,0.55); border:1px solid rgba(224,168,58,0.3);
+      padding:3px 10px; border-radius:100px;
+    }
+    .ncard-body { padding:20px; }
+    .nmeta { display:flex; justify-content:space-between; font-size:12px; color:var(--textdim); margin-bottom:8px; }
+    .ncard-body h3 { font-size:1.25rem; margin-bottom:8px; }
+    .ncontent { font-size:13px; color:var(--textdim); line-height:1.7; }
+    .ncontent.clipped { display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .nfooter { display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:12px; border-top:1px solid var(--border); }
+    .like-btn {
+      display:flex; align-items:center; gap:7px;
+      background:none; border:1px solid var(--border); color:var(--textdim);
+      font-size:13px; font-family:var(--ff-b); padding:6px 14px; border-radius:100px;
+      cursor:pointer; transition:all 0.2s;
+    }
+    .like-btn.liked { color:#e07070; border-color:rgba(224,112,112,0.4); background:rgba(224,112,112,0.08); }
+    .like-btn:hover:not(.liked) { border-color:rgba(201,124,46,0.4); color:var(--ochre); }
+    .more-btn { background:none; border:none; color:var(--ochre); font-size:13px; font-family:var(--ff-b); cursor:pointer; }
+    .more-btn:hover { color:var(--gold); }
+
+    @media(max-width:960px){ .notes-grid { grid-template-columns:1fr 1fr; } }
+    @media(max-width:600px){ .notes-grid { grid-template-columns:1fr; } }
+  </style>
+  <script>
+  /* Hide auth overlay instantly if user is already logged in — prevents flash */
+  (function () {
+    if (localStorage.getItem('ntt_token') && localStorage.getItem('ntt_user')) {
+      document.documentElement.style.setProperty('--overlay-init', 'none');
+    }
+  })();
+</script>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-pattern"></div>
+  <div class="auth-box">
+    <div class="auth-logo-wrap">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.18"/><circle cx="25" cy="34" r="3.5" fill="#C97C2E"/></svg>
+      <h1>Nassor Travel Tours</h1><p>Dar es Salaam · Tanzania</p>
+    </div>
+    <div id="login-form" class="aform on">
+      <h2>Karibu Tena <span class="note">(Welcome Back)</span></h2>
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <div id="login-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleLogin()">Sign In</button>
+      <p class="aswitch">No account? <a href="#" onclick="switchAuth('register')">Create one</a></p>
+      <button class="btn btn-ghost btn-block" onclick="guestMode()">Continue as Guest →</button>
+    </div>
+    <div id="reg-form" class="aform">
+      <h2>Join Us</h2>
+      <div class="fg"><label>Full Name</label><input type="text" id="reg-name" placeholder="Amina Hassan"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="reg-pass" placeholder="min. 6 characters"/></div>
+      <div id="reg-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleRegister()">Create Account</button>
+      <p class="aswitch">Have an account? <a href="#" onclick="switchAuth('login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-row">
+    <a href="../index.html" class="nav-brand">
+      <svg width="30" height="30" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2.5"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.28"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg>
+      Nassor <em>Travel</em>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="itinerary.html">Itinerary</a></li>
+      <li><a href="notes.html" class="cur">Travel Notes</a></li>
+      <li><a href="guestbook.html">Guestbook</a></li>
+      <li><a href="booking.html">booking</a></li>
+    </ul>
+    <div class="nav-right">
+      <span id="nav-who"></span>
+      <button id="nav-out" onclick="logout()">Sign Out</button>
+      <button class="burger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="phero">
+  <div class="phero-inner">
+    <p class="ptag">Field Stories</p>
+    <h1>Travel Notes</h1>
+    <p>Experiences, memories, and observations from our guides and travellers across Tanzania.</p>
+  </div>
+</div>
+
+<!-- NOTES -->
+<section class="notes-sec">
+  <div class="wrap">
+    <div class="label">From the Field</div>
+    <h2 class="section-title">Stories from Tanzania</h2>
+    <div class="notes-grid" id="notes-grid">
+      <!-- rendered by JS below -->
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="foot-brand-logo"><svg width="34" height="34" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.22"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg><strong>Nassor Travel Tours</strong></div>
+      <p>Crafting authentic Tanzanian experiences since 2008.</p>
+      <p class="contact">📍 mbezi beach Street, Dar es Salaam &nbsp;|&nbsp; 📞 +255 764 134 905</p>
+    </div>
+    <div class="foot-col"><h4>Pages</h4><a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a></div>
+    <div class="foot-col"><h4>Top Tours</h4><a href="destinations.html">Kilimanjaro</a><a href="destinations.html">Serengeti Safari</a><a href="destinations.html">Zanzibar Island</a><a href="destinations.html">Ngorongoro</a></div>
+  </div>
+  <div class="foot-bottom wrap">
+    <p>© 2024 Nassor Travel Tours Ltd. · Dar es Salaam, Tanzania</p>
+    <p><em>Karibu Tanzania — You are welcome.</em></p>
+  </div>
+</footer>
+
+<script src="../shared.js"></script>
+<script>
+  var notes = [
+    {
+      id:1, tag:'Safari', date:'Nov 3, 2024', emoji:'🦁',
+      bg:'linear-gradient(135deg,#7a3a10,#3d1c08)',
+      title:'Dawn on the Serengeti',
+      text:'The alarm goes off at 4:30am. No one complains. By 5:15 we are in the Land Rover, hurtling across the dark plains toward the horizon. Our guide Juma drives without headlights — he knows this land by memory, by smell. When the sun rises twenty minutes later, it reveals a pride of eight lions resting on a flat granite rock, the cubs still nuzzling their mothers. We sit in total silence for forty minutes. Nobody takes a photo. Some moments you just have to live.'
+    },
+    {
+      id:2, tag:'Trekking', date:'Oct 18, 2024', emoji:'🏔️',
+      bg:'linear-gradient(135deg,#1e4a1a,#0a2208)',
+      title:'The Roof of Africa at Sunrise',
+      text:'At 4am on Day 5 we leave Kibo Hut in total darkness. The altitude is 4,700m and every step takes effort. Three hours later, as the sky turns the palest pink, the Uhuru Peak sign comes into view. We have climbed 5,895 metres. Africa is spread below us in every direction — a continent under cloud, lit gold. Our guide Baraka quietly sings a Chagga song his grandfather taught him. Nobody is dry-eyed.'
+    },
+    {
+      id:3, tag:'Culture', date:'Sep 22, 2024', emoji:'🏘️',
+      bg:'linear-gradient(135deg,#6b3a20,#321808)',
+      title:'Inside a Maasai Boma',
+      text:'The elder\'s name is Ole Sankale and he is 74 years old. He was born in this boma, a cluster of mud-and-dung houses arranged in a tight circle around a central cattle pen. As we sit on low stools inside his home — the ceiling barely two feet above our heads — he explains the ochre that coats his skin, the beads his wife made, the meaning of each colour. The Maasai word for journey is safari. It means life itself.'
+    },
+    {
+      id:4, tag:'Zanzibar', date:'Aug 9, 2024', emoji:'🏖️',
+      bg:'linear-gradient(135deg,#005a80,#002d45)',
+      title:'Stone Town at Dusk',
+      text:'Stone Town smells of cloves and the sea. The alleys are so narrow two people can barely pass. Ancient wooden doors — carved with brass spikes, Indian geometric patterns, Omani arches — open onto courtyards where old men play bao on stone benches. At the Darajani market, women in black buibui barter over fish still silver from the morning catch. Everything here is a palimpsest — Persian, Omani, Indian, Swahili, Portuguese. At sunset the whole town turns amber.'
+    },
+    {
+      id:5, tag:'Wildlife', date:'Jul 15, 2024', emoji:'🌋',
+      bg:'linear-gradient(135deg,#3a5c38,#1a2c18)',
+      title:'Inside the Ngorongoro Crater',
+      text:'There are 25,000 large mammals on the crater floor — it is one of the densest concentrations of wildlife on earth. By 8am we have seen three lions, a black rhino (rare), a cheetah eating a gazelle, and a herd of 200 elephants moving in slow procession toward the lake. Our driver says it is a normal morning. We spend the rest of the day in stunned silence, watching the crater live and breathe around us.'
+    },
+    {
+      id:6, tag:'Culture', date:'Jun 4, 2024', emoji:'🥘',
+      bg:'linear-gradient(135deg,#5a3a8a,#2a1840)',
+      title:'Cooking with Mama Zawadi',
+      text:'Mama Zawadi has been cooking the same ugali recipe since she was seven years old, taught by her grandmother in a village outside Moshi. She measures flour not in cups but in handfuls. Her biryani uses five spices she won\'t name. We spend the morning chopping, grinding, frying — her kitchen full of smoke and laughter. When we eat, everything tastes of something larger than the ingredients. Hospitality, perhaps. The Swahili call it utu — humanity.'
+    },
+  ];
+
+  function getLikes()  { return JSON.parse(localStorage.getItem('ntt_likes') || '{}'); }
+  function saveLikes(l){ localStorage.setItem('ntt_likes', JSON.stringify(l)); }
+  function getLiked()  { return JSON.parse(localStorage.getItem('ntt_liked') || '[]'); }
+  function saveLiked(l){ localStorage.setItem('ntt_liked', JSON.stringify(l)); }
+
+  function toggleLike(id) {
+    var likes  = getLikes();
+    var liked  = getLiked();
+    var idx    = liked.indexOf(id);
+    var btn    = document.getElementById('lbtn-' + id);
+    var count  = document.getElementById('lcount-' + id);
+    if (idx === -1) {
+      liked.push(id);
+      likes[id] = (likes[id] || 0) + 1;
+      btn.classList.add('liked');
+      btn.innerHTML = '❤️ <span id="lcount-' + id + '">' + likes[id] + '</span>';
+    } else {
+      liked.splice(idx, 1);
+      likes[id] = Math.max(0, (likes[id] || 0) - 1);
+      btn.classList.remove('liked');
+      btn.innerHTML = '🤍 <span id="lcount-' + id + '">' + likes[id] + '</span>';
+    }
+    saveLikes(likes); saveLiked(liked);
+  }
+
+  function toggleMore(id) {
+    var el  = document.getElementById('ntxt-' + id);
+    var btn = document.getElementById('nbtn-' + id);
+    if (el.classList.contains('clipped')) {
+      el.classList.remove('clipped'); btn.textContent = 'Read Less ↑';
+    } else {
+      el.classList.add('clipped'); btn.textContent = 'Read More ↓';
+    }
+  }
+
+  // render
+  var grid  = document.getElementById('notes-grid');
+  var likes = getLikes();
+  var liked = getLiked();
+  for (var i = 0; i < notes.length; i++) {
+    var n = notes[i];
+    var c = likes[n.id] || 0;
+    var isLiked = liked.indexOf(n.id) !== -1;
+    var div = document.createElement('div');
+    div.className = 'ncard';
+    div.innerHTML =
+      '<div class="ncard-cover" style="background:' + n.bg + '">' +
+        n.emoji +
+        '<span class="ntag">' + n.tag + '</span>' +
+      '</div>' +
+      '<div class="ncard-body">' +
+        '<div class="nmeta"><span>' + n.date + '</span></div>' +
+        '<h3>' + n.title + '</h3>' +
+        '<p class="ncontent clipped" id="ntxt-' + n.id + '">' + n.text + '</p>' +
+        '<div class="nfooter">' +
+          '<button class="like-btn' + (isLiked ? ' liked' : '') + '" id="lbtn-' + n.id + '" onclick="toggleLike(' + n.id + ')">' +
+            (isLiked ? '❤️' : '🤍') + ' <span id="lcount-' + n.id + '">' + c + '</span>' +
+          '</button>' +
+          '<button class="more-btn" id="nbtn-' + n.id + '" onclick="toggleMore(' + n.id + ')">Read More ↓</button>' +
+        '</div>' +
+      '</div>';
+    grid.appendChild(div);
+  }
+</script>
+</body>
+</html>

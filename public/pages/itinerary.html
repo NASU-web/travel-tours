@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Itinerary — Nassor Travel Tours</title>
+  <link rel="stylesheet" href="../style.css"/>
+  <style>
+    /* ── Carousel ──────────────────────────────── */
+    .car-sec { padding:90px 0; background:var(--bg2); }
+    .carousel { position:relative; border-radius:12px; overflow:hidden; height:370px; background:var(--surface); margin-top:32px; }
+    .car-track { display:flex; height:100%; transition:transform 0.5s ease; }
+    .car-slide { min-width:100%; height:100%; flex-shrink:0; }
+    .car-inner { width:100%; height:100%; display:flex; align-items:flex-end; padding:28px; position:relative; }
+    .car-inner::after { content:''; position:absolute; inset:0; background:linear-gradient(transparent 40%,rgba(0,0,0,0.72) 100%); }
+    .car-label { position:relative; z-index:1; font-family:var(--ff-h); font-size:1.3rem; color:#fff; }
+    .car-btn {
+      position:absolute; top:50%; transform:translateY(-50%);
+      background:rgba(0,0,0,0.45); border:1px solid rgba(255,255,255,0.2);
+      color:#fff; width:44px; height:44px; border-radius:50%; font-size:20px;
+      cursor:pointer; z-index:10; display:flex; align-items:center; justify-content:center;
+      transition:all 0.2s;
+    }
+    .car-btn:hover { background:rgba(201,124,46,0.75); }
+    .car-prev { left:14px; }
+    .car-next { right:14px; }
+    .car-dots { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); display:flex; gap:8px; z-index:10; }
+    .dot { width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.35); border:none; cursor:pointer; transition:all 0.25s; }
+    .dot.on { background:var(--ochre); width:20px; border-radius:4px; }
+
+    /* ── Table ─────────────────────────────────── */
+    .table-sec { padding:90px 0; }
+    .table-wrap { overflow-x:auto; margin-top:36px; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    thead tr { background:var(--surface2); }
+    th {
+      text-align:left; padding:13px 16px;
+      font-size:11px; font-weight:600; letter-spacing:2px; text-transform:uppercase;
+      color:var(--textdim); border-bottom:1px solid var(--border);
+    }
+    td { border-bottom:1px solid rgba(62,40,16,0.5); vertical-align:top; }
+    .td-main {
+      padding:15px 16px; cursor:pointer; transition:background 0.15s;
+      display:flex; align-items:center; gap:10px;
+    }
+    tr:hover .td-main { background:rgba(201,124,46,0.07); }
+    .day-pill {
+      background:rgba(201,124,46,0.15); color:var(--ochre);
+      font-size:11px; font-weight:600; padding:3px 10px; border-radius:100px;
+      border:1px solid rgba(201,124,46,0.25); white-space:nowrap; flex-shrink:0;
+    }
+    .expand-row { overflow:hidden; max-height:0; transition:max-height 0.35s ease; }
+    .expand-row.open { max-height:160px; }
+    .expand-inner {
+      padding:0 16px 16px 16px; font-size:13px; color:var(--textdim);
+      border-left:2px solid rgba(201,124,46,0.25); margin-left:16px; line-height:1.75;
+    }
+    .arr { margin-left:auto; color:var(--textdim); transition:transform 0.2s; }
+    .arr.open { transform:rotate(180deg); }
+
+    @media(max-width:700px){ th:nth-child(3),th:nth-child(4){ display:none; } }
+  </style>
+  <script>
+  /* Hide auth overlay instantly if user is already logged in — prevents flash */
+  (function () {
+    if (localStorage.getItem('ntt_token') && localStorage.getItem('ntt_user')) {
+      document.documentElement.style.setProperty('--overlay-init', 'none');
+    }
+  })();
+</script>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-overlay" class="auth-overlay">
+  <div class="auth-pattern"></div>
+  <div class="auth-box">
+    <div class="auth-logo-wrap">
+      <svg width="50" height="50" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.18"/><circle cx="25" cy="34" r="3.5" fill="#C97C2E"/></svg>
+      <h1>Nassor Travel Tours</h1><p>Dar es Salaam · Tanzania</p>
+    </div>
+    <div id="login-form" class="aform on">
+      <h2>Karibu Tena <span class="note">(Welcome Back)</span></h2>
+      <div class="fg"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+      <div id="login-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleLogin()">Sign In</button>
+      <p class="aswitch">No account? <a href="#" onclick="switchAuth('register')">Create one</a></p>
+      <button class="btn btn-ghost btn-block" onclick="guestMode()">Continue as Guest →</button>
+    </div>
+    <div id="reg-form" class="aform">
+      <h2>Join Us</h2>
+      <div class="fg"><label>Full Name</label><input type="text" id="reg-name" placeholder="Amina Hassan"/></div>
+      <div class="fg"><label>Email</label><input type="email" id="reg-email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Password</label><input type="password" id="reg-pass" placeholder="min. 6 characters"/></div>
+      <div id="reg-err" class="ferr"></div>
+      <button class="btn btn-fill btn-block" onclick="handleRegister()">Create Account</button>
+      <p class="aswitch">Have an account? <a href="#" onclick="switchAuth('login')">Sign in</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-row">
+    <a href="../index.html" class="nav-brand">
+      <svg width="30" height="30" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2.5"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.28"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg>
+      Nassor <em>Travel</em>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="destinations.html">Destinations</a></li>
+      <li><a href="itinerary.html" class="cur">Itinerary</a></li>
+      <li><a href="notes.html">Travel Notes</a></li>
+      <li><a href="guestbook.html">Guestbook</a></li>
+      <li><a href="booking.html">booking</a></li>
+    </ul>
+    <div class="nav-right">
+      <span id="nav-who"></span>
+      <button id="nav-out" onclick="logout()">Sign Out</button>
+      <button class="burger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="drawer" id="drawer">
+    <a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a>
+  </div>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="phero">
+  <div class="phero-inner">
+    <p class="ptag">Plan Your Trip</p>
+    <h1>10-Day Tanzania Itinerary</h1>
+    <p>The ultimate Tanzanian circuit — Kilimanjaro foothills, the Serengeti plains, Ngorongoro Crater, and Zanzibar's shores.</p>
+  </div>
+</div>
+
+<!-- CAROUSEL -->
+<section class="car-sec">
+  <div class="wrap">
+    <div class="label">Highlights</div>
+    <h2 class="section-title">Destination Gallery</h2>
+    <div class="carousel">
+      <div class="car-track" id="car-track">
+        <div class="car-slide"><div class="car-inner" style="background:url('https://commons.wikimedia.org/wiki/Special:FilePath/Mount_Kilimanjaro.jpg?width=1000') center/cover no-repeat"><div class="car-label">🏔️ Mount Kilimanjaro — 5,895m Summit</div></div></div>
+        <div class="car-slide"><div class="car-inner" style="background:url('https://commons.wikimedia.org/wiki/Special:FilePath/Wildebeest_Migration_in_Serengeti_National_Park,_Tanzania.jpg?width=1000') center/cover no-repeat"><div class="car-label">🦁 Serengeti — The Great Migration</div></div></div>
+        <div class="car-slide"><div class="car-inner" style="background:url('https://commons.wikimedia.org/wiki/Special:FilePath/Ngorongoro_Crater.jpg?width=1000') center/cover no-repeat"><div class="car-label">🌋 Ngorongoro Crater — Home of the Big Five</div></div></div>
+        <div class="car-slide"><div class="car-inner" style="background:url('https://commons.wikimedia.org/wiki/Special:FilePath/White_sandy_beach_at_Nungwi,_Zanzibar.jpg?width=1000') center/cover no-repeat"><div class="car-label">🏖️ Zanzibar — Nungwi Beach at Sunset</div></div></div>
+        <div class="car-slide"><div class="car-inner" style="background:url('https://commons.wikimedia.org/wiki/Special:FilePath/Ngorongoro,_Tanzania_-_Maasai_people.jpg?width=1000') center/cover no-repeat"><div class="car-label">🏘️ Maasai Village — Living Culture</div></div></div>
+      </div>
+      <button class="car-btn car-prev" onclick="carPrev()">‹</button>
+      <button class="car-btn car-next" onclick="carNext()">›</button>
+      <div class="car-dots" id="car-dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ITINERARY TABLE -->
+<section class="table-sec">
+  <div class="wrap">
+    <div class="label">Day by Day</div>
+    <h2 class="section-title">Full Itinerary</h2>
+    <p class="section-sub">Click any row to expand detailed activities for that day.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Day</th>
+            <th>Destination</th>
+            <th>Theme</th>
+            <th>Stay</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="itinerary-body"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">
+      <div class="foot-brand-logo"><svg width="34" height="34" viewBox="0 0 50 50" fill="none"><polygon points="25,4 46,38 4,38" fill="none" stroke="#C97C2E" stroke-width="2"/><polygon points="25,13 40,38 10,38" fill="#C97C2E" opacity="0.22"/><circle cx="25" cy="34" r="3" fill="#C97C2E"/></svg><strong>Nassor Travel Tours</strong></div>
+      <p>Crafting authentic Tanzanian experiences since 2008.</p>
+      <p class="contact">📍 Mbezi beach Street, Dar es Salaam &nbsp;|&nbsp; 📞 +255 764 134 905</p>
+    </div>
+    <div class="foot-col"><h4>Pages</h4><a href="../index.html">Home</a><a href="destinations.html">Destinations</a><a href="itinerary.html">Itinerary</a><a href="notes.html">Travel Notes</a><a href="guestbook.html">Guestbook</a></div>
+    <div class="foot-col"><h4>Top Tours</h4><a href="destinations.html">Kilimanjaro</a><a href="destinations.html">Serengeti Safari</a><a href="destinations.html">Zanzibar Island</a><a href="destinations.html">Ngorongoro</a></div>
+  </div>
+  <div class="foot-bottom wrap">
+    <p>© 2024 Nassor Travel Tours Ltd. · Dar es Salaam, Tanzania</p>
+    <p><em>Karibu Tanzania — You are welcome.</em></p>
+  </div>
+</footer>
+
+<script src="../shared.js"></script>
+<script>
+  // ── Itinerary data ──────────────────────────────────────
+  var days = [
+    { day:'Day 1', dest:'Arusha',           theme:'Arrival',         stay:'Arusha Hotel',         info:'Arrive at Kilimanjaro International Airport. Transfer to Arusha, the safari capital of Tanzania. Welcome dinner with briefing from your Nassor guide.' },
+    { day:'Day 2', dest:'Kilimanjaro Gate',  theme:'Trek Begins',     stay:'Mandara Hut Camp',     info:'Drive to Marangu Gate (1,860m). Begin trekking through lush rainforest. Reach Mandara Hut (2,720m) in 4–5 hours. First views of the peak through the clouds.' },
+    { day:'Day 3', dest:'Kilimanjaro',       theme:'Alpine Moorland', stay:'Horombo Hut Camp',     info:'Trek from Mandara to Horombo Hut (3,720m) across open moorland. Dramatic views of Kibo and Mawenzi peaks. Acclimatisation walk in the afternoon.' },
+    { day:'Day 4', dest:'Kilimanjaro',       theme:'Acclimatisation', stay:'Horombo Hut Camp',     info:'Rest day at Horombo for acclimatisation. Optional hike to Zebra Rocks. Your body prepares for the high altitude ahead. Briefing for the summit push.' },
+    { day:'Day 5', dest:'Kilimanjaro',       theme:'Summit Push',     stay:'Kibo Hut Base Camp',   info:'Trek to Kibo Hut (4,700m) across the volcanic alpine desert. Brief rest before midnight wake-up call. The final push to Uhuru Peak begins at midnight.' },
+    { day:'Day 6', dest:'Kilimanjaro Summit',theme:'Uhuru Peak',      stay:'Horombo Hut Camp',     info:'Reach Uhuru Peak (5,895m) at sunrise — the Roof of Africa. Descend all the way to Horombo Hut. Celebratory dinner with your porters.' },
+    { day:'Day 7', dest:'Serengeti',         theme:'Great Migration',  stay:'Serengeti Tented Camp',info:'Descend Kilimanjaro. Drive to the Serengeti for an afternoon game drive. Witness the endless plains and your first lions, elephants, and zebra.' },
+    { day:'Day 8', dest:'Ngorongoro',        theme:'Crater Safari',   stay:'Ngorongoro Lodge',     info:'Full-day game drive inside the Ngorongoro Crater. All Big Five possible in one day. The crater floor holds over 25,000 animals in a natural enclosure.' },
+    { day:'Day 9', dest:'Zanzibar',          theme:'Spice Island',    stay:'Zanzibar Beach Resort', info:'Fly from Arusha to Zanzibar. Afternoon walking tour of Stone Town — the old Persian and Omani trading port. Sunset dhow cruise and seafood dinner.' },
+    { day:'Day 10',dest:'Zanzibar / Departure','theme':'Farewell',    stay:'Airport Hotel',         info:'Morning at Nungwi Beach — snorkelling or simply relaxing on white sand. Afternoon flight home from Zanzibar International Airport. Kwa heri — until next time!' },
+  ];
+
+  // render table
+  var tbody = document.getElementById('itinerary-body');
+  for (var i = 0; i < days.length; i++) {
+    (function(idx) {
+      var d = days[idx];
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td><div class="td-main" onclick="toggleRow(' + idx + ')">' +
+          '<span class="day-pill">' + d.day + '</span>' +
+        '</div></td>' +
+        '<td><div class="td-main" onclick="toggleRow(' + idx + ')">' + d.dest + '</div></td>' +
+        '<td><div class="td-main" onclick="toggleRow(' + idx + ')">' + d.theme + '</div></td>' +
+        '<td><div class="td-main" onclick="toggleRow(' + idx + ')">' + d.stay + '</div></td>' +
+        '<td>' +
+          '<div class="td-main" onclick="toggleRow(' + idx + ')">' +
+            '<span class="arr" id="arr-' + idx + '">▾</span>' +
+          '</div>' +
+          '<div class="expand-row" id="exp-' + idx + '">' +
+            '<div class="expand-inner">' + d.info + '</div>' +
+          '</div>' +
+        '</td>';
+      tbody.appendChild(tr);
+    })(i);
+  }
+
+  function toggleRow(idx) {
+    var exp = document.getElementById('exp-' + idx);
+    var arr = document.getElementById('arr-' + idx);
+    var isOpen = exp.classList.contains('open');
+    // close all
+    var all = document.querySelectorAll('.expand-row');
+    var allArr = document.querySelectorAll('.arr');
+    for (var i = 0; i < all.length; i++) { all[i].classList.remove('open'); allArr[i].classList.remove('open'); }
+    if (!isOpen) { exp.classList.add('open'); arr.classList.add('open'); }
+  }
+
+  // ── Carousel ────────────────────────────────────────────
+  var carIdx = 0;
+  var slides  = document.querySelectorAll('.car-slide');
+  var dotsWrap = document.getElementById('car-dots');
+  var timer;
+
+  // build dots
+  for (var i = 0; i < slides.length; i++) {
+    var d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' on' : '');
+    d.setAttribute('data-i', i);
+    d.onclick = function() { goSlide(parseInt(this.getAttribute('data-i'))); };
+    dotsWrap.appendChild(d);
+  }
+
+  function goSlide(n) {
+    carIdx = (n + slides.length) % slides.length;
+    document.getElementById('car-track').style.transform = 'translateX(-' + carIdx * 100 + '%)';
+    var dots = document.querySelectorAll('.dot');
+    for (var i = 0; i < dots.length; i++) dots[i].classList.toggle('on', i === carIdx);
+    clearInterval(timer); timer = setInterval(function(){ goSlide(carIdx + 1); }, 4000);
+  }
+  function carPrev() { goSlide(carIdx - 1); }
+  function carNext() { goSlide(carIdx + 1); }
+  timer = setInterval(function(){ goSlide(carIdx + 1); }, 4000);
+</script>
+</body>
+</html>

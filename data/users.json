@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1781425265141,
+    "name": "Amina Hassan",
+    "email": "amina@test.com",
+    "password": "$2b$10$4B0U/8QN8qK33pR5pGGgjudKuLpo0nzqzTJjXwlvG5I9bN8AKkDfq",
+    "createdAt": "2026-06-14T08:21:05.141Z"
+  },
+  {
+    "id": 1781425832383,
+    "name": "nassor ahmed",
+    "email": "nahmed6703@gmail.com",
+    "password": "$2b$10$tnhuAJf32PksN8sMEHWahuM2jhU5QvVq1xf.feANAZLCYHZojXUHa",
+    "createdAt": "2026-06-14T08:30:32.383Z"
+  },
+  {
+    "id": 1781591265826,
+    "name": "chicken",
+    "email": "project@gmail.com",
+    "password": "$2b$10$T7t2FDnr48mjrvDL7uAmC.SmtZIBAJ.0P5qSAwOzrA/U6UVrSi2j2",
+    "createdAt": "2026-06-16T06:27:45.826Z"
+  },
+  {
+    "id": 1781594735676,
+    "name": "AMOBI WISDOM",
+    "email": "wisdomache24@gmail.com",
+    "password": "$2b$10$z3L1MLK5vHsZuXgTsHDyQuMPmtyy1jXcN7NBzIODngz.BYFQTKVE2",
+    "createdAt": "2026-06-16T07:25:35.676Z"
+  }
+]
