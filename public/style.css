@@ -227,5 +227,15 @@ footer {
   .foot-bottom { flex-direction: column; text-align: center; }
   .auth-box { padding: 30px 20px; margin: 14px; }
 }
+.nav-right {
+  flex-wrap: wrap;   /* allows items to move to next line */
+  justify-content: flex-end; /* keeps them aligned right */
+}
+
+#nav-out {
+  font-size: 11px;   /* slightly smaller */
+  padding: 4px 8px;  /* tighter padding */
+}
+
 /* Prevent auth overlay flash on load */
 .auth-overlay { display: var(--overlay-init, flex); }
